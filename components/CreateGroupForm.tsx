@@ -34,6 +34,8 @@ export default function CreateGroupForm({ email }: { email: string }) {
     }
 
     // Add creator as owner
+    const { data: { user } } = await supabase.auth.getUser()
+
     const { error: memberError } = await supabase
       .from('members')
       .insert({
@@ -42,7 +44,8 @@ export default function CreateGroupForm({ email }: { email: string }) {
         name: displayName,
         display_name: displayName,
         role: 'owner',
-        onboarded: true
+        onboarded: true,
+        auth_id: user!.id
       })
 
     if (memberError) {
@@ -57,7 +60,7 @@ export default function CreateGroupForm({ email }: { email: string }) {
   return (
     <main className="min-h-screen flex items-center justify-center bg-stone-50">
       <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-10 w-full max-w-md">
-        
+
         <div className="mb-8 text-center">
           <div className="text-4xl mb-3">🪴</div>
           <h1 className="text-2xl font-bold text-stone-800 mb-1">
