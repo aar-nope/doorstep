@@ -16,7 +16,7 @@ export default function AuthPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+        emailRedirectTo: 'https://doorstep-lemon.vercel.app/auth/callback'
       }
     })
 
@@ -32,13 +32,12 @@ export default function AuthPage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-stone-50">
       <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-10 w-full max-w-md">
-        
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-stone-800 mb-2">
             doorstep 🪴
           </h1>
           <p className="text-stone-500 text-sm">
-            your monthly newsletter from the people you love
+            your monthly letter from the people you love
           </p>
         </div>
 
