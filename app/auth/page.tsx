@@ -26,7 +26,7 @@ export default function AuthPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: 'https://doorstep-lemon.vercel.app/auth'
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
       }
     })
 
