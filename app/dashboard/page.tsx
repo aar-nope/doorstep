@@ -39,7 +39,7 @@ export default async function DashboardPage() {
   return (
     <main className="min-h-screen bg-stone-50 p-8">
       <div className="max-w-xl mx-auto">
-        
+
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-stone-800">
             doorstep 🪴
@@ -76,12 +76,12 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        <button
-          onClick={() => {}}
+        <Link
+          href="/create"
           className="mt-6 text-sm text-stone-400 hover:text-stone-600 transition-colors"
         >
           + create another group
-        </button>
+        </Link>
 
       </div>
     </main>
