@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { Member } from '@/lib/types'
 
 type Props = {
@@ -37,46 +36,22 @@ export default function MembersClient({
     setError('')
     setSuccess('')
 
-    // Check member limit
-    if (members.length >= maxMembers) {
-      setError(`this group is at the ${maxMembers} member limit`)
+    const response = await fetch('/api/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, groupId }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      setError(data.error)
       setLoading(false)
       return
     }
 
-    // Check if already a member
-    const exists = members.find(m => m.email === email)
-    if (exists) {
-      setError('this person is already in the group')
-      setLoading(false)
-      return
-    }
-
-    // Add member row (no auth_id yet — they haven't signed up)
-    const { data: newMember, error: memberError } = await supabase
-      .from('members')
-      .insert({
-        group_id: groupId,
-        email,
-        name,
-        display_name: name,
-        role: 'member',
-        invited_by: currentMember.id,
-        onboarded: false,
-      })
-      .select()
-      .single()
-
-    if (memberError) {
-      setError(memberError.message)
-      setLoading(false)
-      return
-    }
-
-    // TODO: send invite email via Resend (next step)
-
-    setMembers(prev => [...prev, newMember])
-    setSuccess(`${name} has been added! invite email coming soon.`)
+    setMembers(prev => [...prev, data.member])
+    setSuccess(`${name} has been added! they'll get an invite email shortly.`)
     setName('')
     setEmail('')
     setLoading(false)
@@ -85,13 +60,16 @@ export default function MembersClient({
   async function handleRemove(memberId: string) {
     if (!confirm('are you sure you want to remove this member?')) return
 
-    const { error } = await supabase
-      .from('members')
-      .update({ is_active: false })
-      .eq('id', memberId)
+    const response = await fetch('/api/remove-member', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ memberId, groupId }),
+    })
 
-    if (error) {
-      setError(error.message)
+    const data = await response.json()
+
+    if (!response.ok) {
+      setError(data.error)
       return
     }
 
@@ -137,7 +115,6 @@ export default function MembersClient({
                 {member.role}
               </span>
 
-              {/* Only admins can remove, can't remove yourself or owner */}
               {isAdmin &&
                 member.id !== currentMember.id &&
                 member.role !== 'owner' && (
