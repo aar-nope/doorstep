@@ -38,8 +38,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'not authorized' }, { status: 403 })
   }
 
-  // Get the member being removed to check their role
-  const { data: targetMember } = await supabase
+  // Admin client for all subsequent operations
+  const adminClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
+  )
+
+  // Get the member being removed
+  const { data: targetMember } = await adminClient
     .from('members')
     .select('id, role')
     .eq('id', memberId)
@@ -60,12 +66,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'cannot remove yourself' }, { status: 403 })
   }
 
-  // Soft delete via admin client
-  const adminClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!
-  )
-
+  // Soft delete
   const { error } = await adminClient
     .from('members')
     .update({ is_active: false })
